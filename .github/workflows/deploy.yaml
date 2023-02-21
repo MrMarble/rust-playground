@@ -39,7 +39,7 @@ jobs:
         run: cargo build --release --target wasm32-unknown-unknown
       - name: copy artifacts
         run: |
-          mkdir -p /build/asset
+          mkdir -p ./build/asset
           cp ./target/wasm32-unknown-unknown/release/*.wasm /build
           cp ./assets/index.html /build
           cp ./assets/*.png /build/assets
