@@ -1,9 +1,8 @@
 use std::f32::consts::PI;
 
 use macroquad::{
-    prelude::{vec2, Color, Vec2, RED},
+    prelude::{vec2, Vec2, RED},
     rand,
-    shapes::draw_circle,
     texture::{draw_texture_ex, DrawTextureParams, Texture2D},
     window::{screen_height, screen_width},
 };

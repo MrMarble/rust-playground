@@ -1,4 +1,4 @@
-use std::{f32::consts::PI, time::SystemTime};
+use std::f32::consts::PI;
 
 use macroquad::prelude::*;
 use sim::*;
@@ -14,7 +14,7 @@ fn window_conf() -> Conf {
     }
 }
 
-struct Config {
+pub struct Config {
     draw_grid: bool,
     draw_ants: bool,
     draw_markers: bool,
