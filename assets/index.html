@@ -48,7 +48,15 @@
       if (hash) {
         console.log(`Loading ${hash}.wasm`);
         load(`${hash}.wasm`);
+
+        getREADME(hash).then((text) => {
+          document.getElementById("readme").innerHTML = marked.parse(text);
+        });
       }
+    }
+
+    async function getREADME(folder) {
+      return (await fetch(`${folder}/assets/README.md`)).text();
     }
 
     (function () {

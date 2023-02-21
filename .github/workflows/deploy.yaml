@@ -43,6 +43,7 @@ jobs:
           cp -r ./target/wasm32-unknown-unknown/release/*.wasm ./build
           cp ./assets/index.html ./build
           cp -r ./assets/*.png ./build/assets
+          find . -name README.md -exec cp --parents -t ./build/assets {} +
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
