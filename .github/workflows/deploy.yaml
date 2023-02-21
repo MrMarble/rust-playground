@@ -40,9 +40,9 @@ jobs:
       - name: copy artifacts
         run: |
           mkdir -p ./build/asset
-          cp ./target/wasm32-unknown-unknown/release/*.wasm /build
-          cp ./assets/index.html /build
-          cp ./assets/*.png /build/assets
+          cp ./target/wasm32-unknown-unknown/release/*.wasm ./build
+          cp ./assets/index.html ./build
+          cp ./assets/*.png ./build/assets
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
