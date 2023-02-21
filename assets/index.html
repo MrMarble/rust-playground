@@ -22,8 +22,8 @@
       <li><strong>Rust Playground</strong></li>
     </ul>
     <ul>
-      <li><a href="#">Ants</a></li>
-      <li><a href="#">Verlet</a></li>
+      <li><a href="#ants" onclick="load_wasm">Ants</a></li>
+      <li><a href="#verlet" onclick="load_wasm">Verlet</a></li>
       <li><a href="https://github.com/mrmarble/playground" class="contrast" aria-label="Github repository">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
             <path fill="currentColor"
@@ -39,13 +39,23 @@
   <script src="https://not-fl3.github.io/miniquad-samples/mq_js_bundle.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
-    load("/ants/target/wasm32-unknown-unknown/release/ants.wasm")
+    function load_wasm(event) {
+      event.preventDefault();
+      let wasm = event.target.getAttribute("href").substring(1);
+      let canvas = document.getElementById("glcanvas");
+
+      load(`${wasm}.wasm`);
+      /*
+      getREADME("../ants").then((text) => {
+        document.getElementById("readme").innerHTML = marked.parse(text);
+      });*/
+
+    }
+
     async function getREADME(folder) {
       return (await fetch(`${folder}/README.md`)).text();
     }
-    getREADME("../ants").then((text) => {
-      document.getElementById("readme").innerHTML = marked.parse(text);
-    });
+
   </script>
 </body>
 
