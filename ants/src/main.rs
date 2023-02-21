@@ -8,8 +8,8 @@ mod sim;
 fn window_conf() -> Conf {
     Conf {
         window_title: "Ants".to_owned(),
-        window_width: 1920,
-        window_height: 1080,
+        window_width: 1180,
+        window_height: 720,
         ..Default::default()
     }
 }
@@ -34,15 +34,27 @@ async fn main() {
     println!("{} {}", screen_width(), screen_height());
 
     let ant_texture = load_texture("assets/ant.png").await.unwrap();
-    let mut colony = Colony::new(vec2(screen_width() * 0.3, screen_height() * 0.6));
+    let mut colony = Colony::new(vec2(screen_width() * 0.2, screen_height() * 0.5));
     let mut world = World::new(screen_width() as usize, screen_height() as usize);
-    world.add_marker(Marker::new(colony.position, MarkerType::ToHome, 10.0, true));
-
-    world.add_food(Food::new(
-        vec2(screen_width() * 0.5 + 200., screen_height() * 0.5 - 10.),
-        4.,
-        100.,
+    world.add_marker(Marker::new(
+        colony.position,
+        MarkerType::ToHome,
+        100.0,
+        true,
     ));
+
+    for x in 0..10 {
+        for y in 0..10 {
+            world.add_food(Food::new(
+                vec2(
+                    screen_width() * 0.8 + (x as f32 * 4.),
+                    screen_height() * 0.5 + (y as f32 * 4.),
+                ),
+                4.,
+                10.,
+            ));
+        }
+    }
 
     let mut cfg = Config {
         draw_grid: false,
