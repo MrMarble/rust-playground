@@ -70,7 +70,7 @@
       } else {
         getREADME().then((text) => {
           if (text) {
-            document.getElementById("glcanvas").sytyle.display = "none";
+            document.getElementById("glcanvas").style.display = "none";
             document.getElementById("readme").innerHTML = marked.parse(text);
           }
         });
