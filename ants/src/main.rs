@@ -1,179 +1,109 @@
-use std::f32::consts::PI;
+use std::{f32::consts::PI, time::SystemTime};
 
 use macroquad::prelude::*;
+use sim::*;
+
+mod sim;
 
 fn window_conf() -> Conf {
     Conf {
         window_title: "Ants".to_owned(),
-        window_width: 1000,
-        window_height: 1000,
+        window_width: 1920,
+        window_height: 1080,
         ..Default::default()
     }
 }
 
+struct Config {
+    draw_grid: bool,
+    draw_ants: bool,
+    draw_markers: bool,
+}
+
+const MAX_RESERVE: f32 = 2000.0;
+const DIRECTION_UPDATE_PERIOD: f32 = 0.125;
+const MOVE_SPEED: f32 = 50.0;
+const MARKER_DETECTION_RADIUS: f32 = 40.0;
+const MARKER_PERIOD: f32 = 0.25;
+const DIRECTION_NOISE: f32 = PI * 0.1;
+const ROTATION_SPEED: f32 = 10.0;
+const MAX_MARKER_PER_CELL: usize = 1024;
+const MAX_ANTS: usize = 512;
 #[macroquad::main(window_conf)]
 async fn main() {
+    println!("{} {}", screen_width(), screen_height());
+
     let ant_texture = load_texture("ant.png").await.unwrap();
-    let mut colony = Colony::new(vec2(screen_width() * 0.5, screen_height() * 0.5));
+    let mut colony = Colony::new(vec2(screen_width() * 0.3, screen_height() * 0.6));
+    let mut world = World::new(screen_width() as usize, screen_height() as usize);
+    world.add_marker(Marker::new(colony.position, MarkerType::ToHome, 10.0, true));
+
+    world.add_food(Food::new(
+        vec2(screen_width() * 0.5 + 200., screen_height() * 0.5 - 10.),
+        4.,
+        100.,
+    ));
+
+    let mut cfg = Config {
+        draw_grid: false,
+        draw_ants: true,
+        draw_markers: true,
+    };
 
     loop {
         clear_background(BLACK);
 
-        colony.draw(ant_texture);
-        colony.update(0.016);
+        //let render_timer = SystemTime::now();
 
-        draw_text(&format!("FPS {}", get_fps()), 20.0, 20.0, 20.0, WHITE);
-        next_frame().await
-    }
-}
-
-struct Colony {
-    position: Vec2,
-    ants: [Ant; 100],
-}
-
-impl Colony {
-    fn new(position: Vec2) -> Self {
-        let mut ants = [Ant::new(position, 0.0); 100];
-        // TODO: Randomize rotation
-        for ant in ants.iter_mut() {
-            *ant = Ant::new(position, rand::gen_range(0.0, 2.0 * PI));
-        }
-        Self { position, ants }
-    }
-
-    fn update(&mut self, dt: f32) {
-        for ant in self.ants.iter_mut() {
-            ant.update(dt);
-        }
-    }
-
-    fn draw(&self, texture: Texture2D) {
-        draw_circle(self.position.x, self.position.y, 10.0, DARKBLUE);
-        for ant in self.ants.iter() {
-            ant.draw(texture);
-        }
-    }
-}
-
-#[derive(Clone, Copy)]
-struct Ant {
-    position: Vec2,
-    direction: Direction,
-    last_direction_update: f32,
-}
-
-impl Ant {
-    fn new(position: Vec2, rotation: f32) -> Self {
-        Self {
-            position,
-            direction: Direction::new(rotation, 10.0),
-            last_direction_update: rand::gen_range(0.01 * 0.125, 100.0),
-        }
-    }
-
-    fn update(&mut self, dt: f32) {
-        self.update_position(dt);
-
-        self.last_direction_update += dt;
-        if self.last_direction_update > 0.125 {
-            self.direction += rand::gen_range(0., PI * 0.1);
-            self.last_direction_update = 0.0;
-        }
-
-        self.direction.update(dt);
-    }
-
-    fn update_position(&mut self, dt: f32) {
-        self.position += (dt * 50.0) * self.direction.vec;
-
-        // check out of bounds
-        if self.position.x < 0.0 {
-            self.position.x = screen_width();
-        } else if self.position.x > screen_width() {
-            self.position.x = 0.0;
-        }
-
-        if self.position.y < 0.0 {
-            self.position.y = screen_height();
-        } else if self.position.y > screen_height() {
-            self.position.y = 0.0;
-        }
-    }
-
-    fn draw(&self, texture: Texture2D) {
-        draw_texture_ex(
-            texture,
-            self.position.x - 5.0,
-            self.position.y - 7.5,
-            RED,
-            DrawTextureParams {
-                dest_size: Some(vec2(10.0, 15.0)),
-                source: None,
-                rotation: self.direction.angle + (PI / 2.0),
-                flip_x: false,
-                flip_y: false,
-                pivot: None,
-            },
+        world.draw(&cfg);
+        colony.draw(ant_texture, &cfg);
+        /*draw_text(
+            &format!(
+                "render: {:.3}ms",
+                render_timer.elapsed().unwrap().as_millis()
+            ),
+            20.0,
+            50.0,
+            20.0,
+            WHITE,
         );
-    }
-}
+        let update_timer = SystemTime::now();*/
+        colony.update(0.016, &mut world);
+        world.update(0.016);
+        /*draw_text(
+            &format!(
+                "update: {:.3}ms",
+                update_timer.elapsed().unwrap().as_millis()
+            ),
+            20.0,
+            65.0,
+            20.0,
+            WHITE,
+        );*/
+        draw_text(&format!("FPS {}", get_fps()), 20.0, 20.0, 20.0, WHITE);
+        draw_text(
+            &format!("frame: {:.3}ms", get_frame_time()),
+            20.0,
+            35.0,
+            20.0,
+            WHITE,
+        );
 
-#[derive(Clone, Copy)]
-struct Direction {
-    angle: f32,
-    target_angle: f32,
-    rotation_speed: f32,
-    vec: Vec2,
-    target_vec: Vec2,
-}
+        if is_key_pressed(KeyCode::G) {
+            cfg.draw_grid = !cfg.draw_grid;
+        }
+        if is_key_pressed(KeyCode::A) {
+            cfg.draw_ants = !cfg.draw_ants;
+        }
+        if is_key_pressed(KeyCode::M) {
+            cfg.draw_markers = !cfg.draw_markers;
+        }
 
-impl std::ops::AddAssign<f32> for Direction {
-    fn add_assign(&mut self, rhs: f32) {
-        self.target_angle += rhs;
-        self.update_target_vec();
-    }
-}
+        if is_mouse_button_pressed(MouseButton::Left) {
+            let mouse_pos = mouse_position();
+            world.add_food(Food::new(vec2(mouse_pos.0, mouse_pos.1), 4., 100.));
+        }
 
-impl std::ops::Add<f32> for Direction {
-    type Output = Self;
-
-    fn add(mut self, rhs: f32) -> Self::Output {
-        self.target_angle += rhs;
-        self.update_target_vec();
-        self
-    }
-}
-
-impl Direction {
-    fn new(angle: f32, rotation_speed: f32) -> Self {
-        let mut dir = Self {
-            angle,
-            target_angle: angle,
-            rotation_speed,
-            vec: vec2(angle.cos(), angle.sin()),
-            target_vec: vec2(angle.cos(), angle.sin()),
-        };
-
-        dir.update_vec();
-        dir.target_vec = dir.vec;
-        dir
-    }
-
-    fn update(&mut self, dt: f32) {
-        self.update_vec();
-
-        let dir_nrm = self.vec.normalize();
-        let dir_delta = self.target_vec.dot(dir_nrm);
-        self.angle += self.rotation_speed * dir_delta * dt;
-    }
-
-    fn update_vec(&mut self) {
-        self.vec = vec2(self.angle.cos(), self.angle.sin());
-    }
-
-    fn update_target_vec(&mut self) {
-        self.target_vec.x += self.target_angle.cos();
-        self.target_vec.y += self.target_angle.sin();
+        next_frame().await
     }
 }
