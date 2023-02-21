@@ -33,7 +33,7 @@ const MAX_ANTS: usize = 512;
 async fn main() {
     println!("{} {}", screen_width(), screen_height());
 
-    let ant_texture = load_texture("ant.png").await.unwrap();
+    let ant_texture = load_texture("assets/ant.png").await.unwrap();
     let mut colony = Colony::new(vec2(screen_width() * 0.3, screen_height() * 0.6));
     let mut world = World::new(screen_width() as usize, screen_height() as usize);
     world.add_marker(Marker::new(colony.position, MarkerType::ToHome, 10.0, true));
