@@ -48,7 +48,7 @@
       if (hash) {
         console.log(`Loading ${hash}.wasm`);
         load(`${hash}.wasm`);
-        document.getElementById("glcanvas").sytyle.display = "";
+        document.getElementById("glcanvas").style.display = "";
         getREADME(hash).then((text) => {
           if (text) {
             document.getElementById("readme").innerHTML = marked.parse(text);
@@ -57,7 +57,7 @@
       }
     }
 
-    async function getREADME(folder) {
+    async function getREADME(folder = "") {
       return (await fetch(`assets/${folder}/README.md`)).text();
     }
 
@@ -66,7 +66,7 @@
       const hash = window.location.hash.substring(1);
       if (hash) {
         console.log(`Loading ${hash}.wasm`);
-        load_wasm(`${hash}.wasm`);
+        load_wasm(hash);
       } else {
         getREADME().then((text) => {
           if (text) {
