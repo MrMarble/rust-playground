@@ -41,8 +41,7 @@
   <script>
     function load_wasm(event) {
       event.preventDefault();
-      let wasm = event.target.getAttribute("href").substring(1);
-      let canvas = document.getElementById("glcanvas");
+      const wasm = event.target.getAttribute("href").substring(1);
 
       load(`${wasm}.wasm`);
       /*
@@ -56,6 +55,15 @@
       return (await fetch(`${folder}/README.md`)).text();
     }
 
+
+    function onLoad() {
+      const wasm = location.hash;
+      if (wasm) {
+        load(`${wasm}.wasm`);
+      }
+    }
+
+    onLoad();
   </script>
 </body>
 
