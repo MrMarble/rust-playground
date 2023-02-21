@@ -22,10 +22,8 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - name: Install wasm target
-        run: rustup target add wasm32-unknown-unknown
-      - uses: actions/cache@v2
+        uses: actions/checkout@v3
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.cargo/registry
@@ -35,6 +33,8 @@ jobs:
           restore-keys: |
             cache-cargo-${{ hashFiles('**/Cargo.toml') }}
             cache-cargo
+      - name: Install wasm target
+        run: rustup target add wasm32-unknown-unknown
       - name: Build
         run: cargo build --release --target wasm32-unknown-unknown
       - name: copy artifacts
