@@ -48,20 +48,33 @@
       if (hash) {
         console.log(`Loading ${hash}.wasm`);
         load(`${hash}.wasm`);
-
+        document.getElementById("glcanvas").sytyle.display = "";
         getREADME(hash).then((text) => {
-          document.getElementById("readme").innerHTML = marked.parse(text);
+          if (text) {
+            document.getElementById("readme").innerHTML = marked.parse(text);
+          }
         });
       }
     }
 
     async function getREADME(folder) {
-      return (await fetch(`${folder}/assets/README.md`)).text();
+      return (await fetch(`assets/${folder}/README.md`)).text();
     }
 
     (function () {
       console.log("Page loaded!");
-      load_wasm(window.location.hash.substring(1))
+      const hash = window.location.hash.substring(1);
+      if (hash) {
+        console.log(`Loading ${hash}.wasm`);
+        load_wasm(`${hash}.wasm`);
+      } else {
+        getREADME().then((text) => {
+          if (text) {
+            document.getElementById("glcanvas").sytyle.display = "none";
+            document.getElementById("readme").innerHTML = marked.parse(text);
+          }
+        });
+      }
     })();
   </script>
 </body>
