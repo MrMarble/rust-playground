@@ -167,7 +167,7 @@ impl Ant {
             self.position.y - 7.5,
             RED,
             DrawTextureParams {
-                dest_size: Some(vec2(10.0, 15.0)),
+                dest_size: Some(vec2(5.0, 7.0)),
                 source: None,
                 rotation: self.direction.angle + (PI / 2.0),
                 flip_x: false,
