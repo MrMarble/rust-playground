@@ -58,7 +58,10 @@
     }
 
     async function getREADME(folder = "") {
-      return (await fetch(`assets/${folder}/README.md`)).text();
+      const md = await fetch(`assets/${folder}/README.md`)
+      if (md.ok) {
+        return await md.text()
+      }
     }
 
     (function () {
