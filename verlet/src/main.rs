@@ -32,7 +32,7 @@ async fn main() {
             let mouse_pos = vec2(mouse_position().0, mouse_position().1);
             solver.add_object(Object::new(
                 mouse_pos,
-                rand::gen_range(5.0, 20.),
+                rand::gen_range(screen_width() * 0.005, screen_width() * 0.020),
                 get_rainbow(get_time() as f32),
             ));
         }
@@ -41,7 +41,7 @@ async fn main() {
             let angle = get_time().sin() as f32 + PI * 0.5;
             let mut obj = Object::new(
                 vec2(screen_width() / 2.0, 30.0),
-                rand::gen_range(5.0, 15.),
+                rand::gen_range(screen_width() * 0.005, screen_width() * 0.020),
                 get_rainbow(get_time() as f32),
             );
             obj.set_velocity(vec2(angle.cos(), angle.sin()) * SPAWN_SPEED);
