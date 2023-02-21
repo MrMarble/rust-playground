@@ -1,0 +1,53 @@
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install wasm target
+        run: rustup target add wasm32-unknown-unknown
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cache-cargo-${{ hashFiles('**/Cargo.toml') }}
+          restore-keys: |
+            cache-cargo-${{ hashFiles('**/Cargo.toml') }}
+            cache-cargo
+      - name: Build
+        run: cargo build --release --target wasm32-unknown-unknown
+      - name: copy artifacts
+        run: |
+          mkdir -p /build/asset
+          cp ./target/wasm32-unknown-unknown/release/*.wasm /build
+          cp ./assets/index.html /build
+          cp ./assets/*.png /build/assets
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: "build"
+
+      - name: Deploy 🚀
+        id: deployment
+        uses: actions/deploy-pages@v1
