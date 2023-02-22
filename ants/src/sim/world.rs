@@ -97,8 +97,8 @@ impl World {
     pub fn new(width: usize, height: usize) -> Self {
         let img = Image::gen_image_color(width as u16, height as u16, BLACK);
         Self {
-            grid_home_markers: Grid::new(width, height, 58),
-            grid_food_markers: Grid::new(width, height, 58),
+            grid_home_markers: Grid::new(width + 45, height, 45),
+            grid_food_markers: Grid::new(width + 45, height, 45),
             grid_food: Grid::new(width, height, 5),
             texture: Texture2D::from_image(&img),
             img,
@@ -194,8 +194,10 @@ impl World {
         if cfg.draw_grid {
             for i in 0..self.grid_food_markers.cells.len() {
                 // draw grid
-                let x = i % (screen_width() / self.grid_food_markers.cell_size as f32) as usize;
-                let y = i / (screen_width() / self.grid_food_markers.cell_size as f32) as usize;
+                let x =
+                    i % ((screen_width() + 45.) / self.grid_food_markers.cell_size as f32) as usize;
+                let y =
+                    i / ((screen_width() + 45.) / self.grid_food_markers.cell_size as f32) as usize;
                 draw_rectangle_lines(
                     (x * self.grid_food_markers.cell_size) as f32,
                     (y * self.grid_food_markers.cell_size) as f32,
