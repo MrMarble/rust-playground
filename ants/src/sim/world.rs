@@ -13,18 +13,18 @@ pub struct Grid<T> {
     width: usize,
     height: usize,
     cell_size: usize,
-    cells: Vec<Vec<Option<T>>>,
+    cells: Vec<Vec<T>>,
 }
 
 impl<T: Clone> Grid<T> {
-    fn new(_width: usize, _height: usize, default: Option<T>, cell_size: usize) -> Self {
+    fn new(_width: usize, _height: usize, cell_size: usize) -> Self {
         let width = _width / cell_size;
         let height = _height / cell_size;
 
         Self {
             width,
             height,
-            cells: vec![vec![default]; width * height],
+            cells: vec![vec![]; width * height],
             cell_size,
         }
     }
@@ -49,7 +49,7 @@ impl<T: Clone> Grid<T> {
         if self.check_bounds(x, y) {
             let index = self.get_index(x, y);
             if self.cells[index].len() < MAX_MARKER_PER_CELL {
-                self.cells[index].push(Some(value));
+                self.cells[index].push(value);
             }
         }
     }
@@ -66,9 +66,7 @@ impl<T: Clone> Grid<T> {
                 if self.check_bounds(x, y) {
                     let index = self.get_index(x, y);
                     for cell in self.cells[index].iter() {
-                        if let Some(cell) = cell {
-                            result.push(cell.clone());
-                        }
+                        result.push(cell.clone());
                     }
                 }
             }
@@ -80,10 +78,7 @@ impl<T: Clone> Grid<T> {
         let (x, y) = self.get_cell_coords(pos);
         if self.check_bounds(x, y) {
             let index = self.get_index(x, y);
-            self.cells[index]
-                .iter_mut()
-                .filter_map(|x| x.as_mut())
-                .collect()
+            self.cells[index].iter_mut().collect()
         } else {
             vec![]
         }
@@ -102,9 +97,9 @@ impl World {
     pub fn new(width: usize, height: usize) -> Self {
         let img = Image::gen_image_color(width as u16, height as u16, BLACK);
         Self {
-            grid_home_markers: Grid::new(width, height, None, 58),
-            grid_food_markers: Grid::new(width, height, None, 58),
-            grid_food: Grid::new(width, height, None, 5),
+            grid_home_markers: Grid::new(width, height, 58),
+            grid_food_markers: Grid::new(width, height, 58),
+            grid_food: Grid::new(width, height, 5),
             texture: Texture2D::from_image(&img),
             img,
         }
@@ -141,35 +136,17 @@ impl World {
 
     fn remove_expired_markers(&mut self) {
         for cell_list in &mut self.grid_home_markers.cells {
-            cell_list.retain(|cell| {
-                if let Some(marker) = cell {
-                    marker.intensity > 0.0
-                } else {
-                    false
-                }
-            });
+            cell_list.retain(|cell| cell.intensity > 0.0);
         }
 
         for cell_list in &mut self.grid_food_markers.cells {
-            cell_list.retain(|cell| {
-                if let Some(marker) = cell {
-                    marker.intensity > 0.0
-                } else {
-                    false
-                }
-            });
+            cell_list.retain(|cell| cell.intensity > 0.0);
         }
     }
 
     fn remove_expired_food(&mut self) {
         for cell_list in &mut self.grid_food.cells {
-            cell_list.retain(|cell| {
-                if let Some(food) = cell {
-                    !food.is_empty()
-                } else {
-                    false
-                }
-            });
+            cell_list.retain(|cell| !cell.is_empty());
         }
     }
 
@@ -179,17 +156,13 @@ impl World {
 
         for cell_list in &mut self.grid_home_markers.cells {
             for cell in cell_list {
-                if let Some(marker) = cell {
-                    marker.update(dt);
-                }
+                cell.update(dt);
             }
         }
 
         for cell_list in &mut self.grid_food_markers.cells {
             for cell in cell_list {
-                if let Some(marker) = cell {
-                    marker.update(dt);
-                }
+                cell.update(dt);
             }
         }
     }
@@ -198,17 +171,13 @@ impl World {
         if cfg.draw_markers {
             for cell_list in &self.grid_home_markers.cells {
                 for cell in cell_list {
-                    if let Some(marker) = cell {
-                        marker.draw(&mut self.img);
-                    }
+                    cell.draw(&mut self.img);
                 }
             }
 
             for cell_list in &self.grid_food_markers.cells {
                 for cell in cell_list {
-                    if let Some(marker) = cell {
-                        marker.draw(&mut self.img);
-                    }
+                    cell.draw(&mut self.img);
                 }
             }
 
@@ -218,9 +187,7 @@ impl World {
 
         for cell_list in &self.grid_food.cells {
             for cell in cell_list {
-                if let Some(food) = cell {
-                    food.draw();
-                }
+                cell.draw();
             }
         }
 
