@@ -11,17 +11,19 @@ fn window_conf() -> Conf {
     }
 }
 
-const MAX_OBJECTS: usize = 400;
-const SPAWN_RATE: f32 = 0.025;
-const SPAWN_SPEED: f32 = 5.0;
+const MAX_OBJECTS: usize = 350;
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let center = vec2(screen_width() / 2.0, screen_height() / 2.0);
-    let mut solver = Solver::new(3);
-    solver.set_constraint(center, screen_height() / 2.0 - 20.0);
-
+    let radius = screen_height() / 2.0 - 20.0;
+    let max_ball_size = (radius.powf(2.0) / MAX_OBJECTS as f32).sqrt();
+    let min_ball_size = max_ball_size * 0.25;
     let mut spawn_timer = 0.0;
+    let spawn_speed: f32 = 0.005 * screen_height();
+    let spawn_rate: f32 = max_ball_size / (spawn_speed / 0.01);
+
+    let mut solver = Solver::new(3);
+    solver.set_constraint(vec2(screen_width() / 2.0, screen_height() / 2.0), radius);
     loop {
         clear_background(DARKGRAY);
 
@@ -32,23 +34,23 @@ async fn main() {
             let mouse_pos = vec2(mouse_position().0, mouse_position().1);
             solver.add_object(Object::new(
                 mouse_pos,
-                rand::gen_range(screen_width() * 0.005, screen_width() * 0.020),
+                rand::gen_range(min_ball_size, max_ball_size),
                 get_rainbow(get_time() as f32),
             ));
         }
 
-        if solver.objects.len() < MAX_OBJECTS && spawn_timer > SPAWN_RATE {
+        if solver.objects.len() < MAX_OBJECTS && spawn_timer > spawn_rate {
             let angle = get_time().sin() as f32 + PI * 0.5;
             let mut obj = Object::new(
-                vec2(screen_width() / 2.0, 30.0),
-                rand::gen_range(screen_width() * 0.005, screen_width() * 0.020),
+                vec2(screen_width() / 2.0, 20.0 + max_ball_size),
+                rand::gen_range(min_ball_size, max_ball_size),
                 get_rainbow(get_time() as f32),
             );
-            obj.set_velocity(vec2(angle.cos(), angle.sin()) * SPAWN_SPEED);
+            obj.set_velocity(vec2(angle.cos(), angle.sin()) * spawn_speed);
             solver.add_object(obj);
             spawn_timer = 0.0;
         }
-        spawn_timer += get_frame_time();
+        spawn_timer += 0.016;
         draw_text(&format!("FPS {}", get_fps()), 20.0, 20.0, 30.0, WHITE);
         draw_text(
             &format!("Objects {}", solver.objects.len()),
