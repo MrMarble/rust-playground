@@ -24,7 +24,7 @@ dependencies = [
 name = "ants"
 version = "0.1.0"
 dependencies = [
- "macroquad",
+ "macroquad 0.3.26",
 ]
 
 [[package]]
@@ -175,6 +175,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "island"
+version = "0.1.0"
+dependencies = [
+ "macroquad 0.4.4",
+]
+
+[[package]]
 name = "lewton"
 version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -202,9 +209,25 @@ dependencies = [
  "glam",
  "image",
  "macroquad_macro",
- "miniquad",
+ "miniquad 0.3.16",
  "quad-rand",
  "quad-snd",
+]
+
+[[package]]
+name = "macroquad"
+version = "0.4.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a0bf249d79f5080e200334fe30ffca25582d682ee2e180768ad7f121ba9f8caa"
+dependencies = [
+ "bumpalo",
+ "fontdue",
+ "glam",
+ "image",
+ "macroquad_macro",
+ "miniquad 0.4.0-alpha.10",
+ "quad-rand",
+ "slotmap",
 ]
 
 [[package]]
@@ -233,6 +256,18 @@ name = "miniquad"
 version = "0.3.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c1251d63dfea7109063b2cec354253e8bf150e7878837a6ac0f9185d6a2518b6"
+dependencies = [
+ "libc",
+ "ndk-sys",
+ "objc",
+ "winapi",
+]
+
+[[package]]
+name = "miniquad"
+version = "0.4.0-alpha.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "18742c400c9aa2d9b4ca72d366a38c9e2d896386e50c2e6d905b6028543a0a0b"
 dependencies = [
  "libc",
  "ndk-sys",
@@ -355,6 +390,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d66dc143e6b11c1eddc06d5c423cfc97062865baf299914ab64caa38182078fe"
 
 [[package]]
+name = "slotmap"
+version = "1.0.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dbff4acf519f630b3a3ddcfaea6c06b42174d9a44bc70c620e9ed1649d58b82a"
+dependencies = [
+ "version_check",
+]
+
+[[package]]
 name = "smallvec"
 version = "0.6.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -390,7 +434,7 @@ checksum = "3354b9ac3fae1ff6755cb6db53683adb661634f67557942dea4facebec0fee4b"
 name = "verlet"
 version = "0.1.0"
 dependencies = [
- "macroquad",
+ "macroquad 0.3.26",
 ]
 
 [[package]]
