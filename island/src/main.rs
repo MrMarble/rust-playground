@@ -37,7 +37,7 @@ async fn main() {
         // Update shadows
         if is_mouse_button_pressed(MouseButton::Left) {
             let (mx, my) = mouse_position();
-            let mut shadow_img: Image = Image::from(img.clone());
+            let mut shadow_img: Image = img.clone();
             draw_shadows(&mut shadow_img, &terrain, vec3(mx, my, 1.0));
             texture.update(&shadow_img);
         }
@@ -87,10 +87,10 @@ fn generate_terrain(p: &perlin::Perlin) -> Vec<Vec<f32>> {
 }
 
 fn island_mod(x: f32, y: f32) -> f32 {
-    let max_dist = ((screen_width() as f32).min(screen_height() as f32) / 2.0 as f32).powi(2);
+    let max_dist = (screen_width().min(screen_height()) / 2.0_f32).powi(2);
 
-    let dx = screen_width() as f32 / 2.0 - x;
-    let dy = screen_height() as f32 / 2.0 - y;
+    let dx = screen_width() / 2.0 - x;
+    let dy = screen_height() / 2.0 - y;
 
     let dist_square = dx.powi(2) + dy.powi(2);
     map(dist_square, 0.0, max_dist, 1.0, 0.0)
@@ -146,7 +146,7 @@ fn draw_shadows(img: &mut Image, terrain: &Vec<Vec<f32>>, sun: Vec3) {
 }
 
 fn shade(color: Color) -> Color {
-    return mix(color, Color::from_hex(0x000), 0.5);
+    mix(color, Color::from_hex(0x000), 0.5)
 }
 
 fn mix(color_a: Color, color_b: Color, amount: f32) -> Color {
