@@ -1,7 +1,4 @@
-use std::{
-    ops::{Add, AddAssign, Mul, Sub},
-    time::Instant,
-};
+use std::ops::{AddAssign, Mul, Sub};
 
 use macroquad::prelude::*;
 
@@ -39,17 +36,13 @@ async fn main() {
 
         // Update shadows
         if is_mouse_button_pressed(MouseButton::Left) {
-            let start = Instant::now();
             let (mx, my) = mouse_position();
             let mut shadow_img: Image = Image::from(img.clone());
             draw_shadows(&mut shadow_img, &terrain, vec3(mx, my, 1.0));
             texture.update(&shadow_img);
-
-            println!("shadow time: {:?}", start.elapsed());
         }
 
         if is_key_pressed(KeyCode::Space) {
-            let start = Instant::now();
             p.reseed();
             terrain = generate_terrain(&p);
             // Colorize
@@ -63,7 +56,6 @@ async fn main() {
 
             // Update texture
             texture.update(&img);
-            println!("island time: {:?}", start.elapsed());
         }
 
         // Draw to screen
