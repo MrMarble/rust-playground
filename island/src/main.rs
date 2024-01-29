@@ -7,14 +7,9 @@ use macroquad::prelude::*;
 
 mod perlin;
 
-const WIDTH: usize = 400;
-const HEIGHT: usize = 400;
-
 fn window_conf() -> Conf {
     Conf {
         window_title: "Island".to_owned(),
-        window_width: WIDTH as i32,
-        window_height: HEIGHT as i32,
         window_resizable: false,
         ..Default::default()
     }
@@ -23,14 +18,13 @@ fn window_conf() -> Conf {
 #[macroquad::main(window_conf)]
 async fn main() {
     let mut p = perlin::Perlin::new();
-
     let mut terrain = generate_terrain(&p);
-    let mut img = Image::gen_image_color(WIDTH as u16, HEIGHT as u16, BLACK);
+    let mut img = Image::gen_image_color(screen_width() as u16, screen_height() as u16, BLACK);
     let texture = Texture2D::from_image(&img);
 
     // Colorize
-    for x in 0..WIDTH {
-        for y in 0..HEIGHT {
+    for x in 0..screen_width() as usize {
+        for y in 0..screen_height() as usize {
             let n = terrain[x][y];
             //let color = Color::new(n, n, n, 1.0);
             img.set_pixel(x as u32, y as u32, colorize(n));
@@ -59,8 +53,8 @@ async fn main() {
             p.reseed();
             terrain = generate_terrain(&p);
             // Colorize
-            for x in 0..WIDTH {
-                for y in 0..HEIGHT {
+            for x in 0..screen_width() as usize {
+                for y in 0..screen_height() as usize {
                     let n = terrain[x][y];
                     //let color = Color::new(n, n, n, 1.0);
                     img.set_pixel(x as u32, y as u32, colorize(n));
@@ -88,10 +82,11 @@ async fn main() {
 }
 
 fn generate_terrain(p: &perlin::Perlin) -> Vec<Vec<f32>> {
-    let mut terrain: Vec<Vec<f32>> = vec![vec![0.0; HEIGHT]; WIDTH];
+    let mut terrain: Vec<Vec<f32>> =
+        vec![vec![0.0; screen_height() as usize]; screen_width() as usize];
 
-    for x in 0..WIDTH {
-        for y in 0..HEIGHT {
+    for x in 0..screen_width() as usize {
+        for y in 0..screen_height() as usize {
             let n = p.noise2d(x as f32 * 0.01, y as f32 * 0.01);
             terrain[x][y] = (n * island_mod(x as f32, y as f32)).max(0.3)
         }
@@ -100,10 +95,10 @@ fn generate_terrain(p: &perlin::Perlin) -> Vec<Vec<f32>> {
 }
 
 fn island_mod(x: f32, y: f32) -> f32 {
-    let max_dist = (WIDTH as f32 / 2.0 as f32).powi(2);
+    let max_dist = ((screen_width() as f32).min(screen_height() as f32) / 2.0 as f32).powi(2);
 
-    let dx = WIDTH as f32 / 2.0 - x;
-    let dy = HEIGHT as f32 / 2.0 - y;
+    let dx = screen_width() as f32 / 2.0 - x;
+    let dy = screen_height() as f32 / 2.0 - y;
 
     let dist_square = dx.powi(2) + dy.powi(2);
     map(dist_square, 0.0, max_dist, 1.0, 0.0)
@@ -128,8 +123,8 @@ fn colorize(n: f32) -> Color {
 
 fn draw_shadows(img: &mut Image, terrain: &Vec<Vec<f32>>, sun: Vec3) {
     // Colorize
-    for x in 0..WIDTH {
-        for y in 0..HEIGHT {
+    for x in 0..screen_width() as usize {
+        for y in 0..screen_height() as usize {
             let h = terrain[x][y];
 
             let mut p = vec3(x as f32, y as f32, h);
